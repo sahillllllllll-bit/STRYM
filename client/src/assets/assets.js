@@ -1,9 +1,9 @@
-import logo from './logo.svg'
+import logo from './logo.svg.png'
 import sample_cover from './sample_cover.jpg'
 import sample_profile from './sample_profile.jpg'
 import bgImage from './bgImage.png'
 import group_users from './group_users.png'
-import { Home, MessageCircle, Search, UserIcon, Users } from 'lucide-react'
+import { Home, MessageCircle, Search, UserIcon, Users,Projector, SunMoon } from 'lucide-react'
 import sponsored_img from './sponsored_img.png'
 
 export const assets = {
@@ -17,10 +17,12 @@ export const assets = {
 
 export const menuItemsData = [
     { to: '/', label: 'Feed', Icon: Home },
-    { to: '/messages', label: 'Messages', Icon: MessageCircle },
-    { to: '/connections', label: 'Connections', Icon: Users },
     { to: '/discover', label: 'Discover', Icon: Search },
+    { to: '/minto', label: 'Minto - Short Videos', Icon: Projector },
+    { to: '/connections', label: 'Followers/Followings', Icon: Users },
+    { to: '/messages', label: 'Messages', Icon: MessageCircle },
     { to: '/profile', label: 'Profile', Icon: UserIcon },
+        { to: '/theme', label: 'Change Theme', Icon: SunMoon},
 ];
 
 export const dummyUserData = {
@@ -56,6 +58,27 @@ const dummyUser3Data = {
     full_name: "Alexa james",
     profile_picture: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop",
 }
+const dummyUser6Data = {
+    ...dummyUserData,
+    _id: "user_3",
+    username: "alexa_james",
+    full_name: "Alexa james",
+    profile_picture: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop",
+}
+const dummyUser4Data = {
+    ...dummyUserData,
+    _id: "user_4",
+    username: "sahilx__!",
+    full_name: "Sahil singh",
+    profile_picture: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop",
+}
+const dummyUser5Data = {
+    ...dummyUserData,
+    _id: "user_5",
+    username: "Shivani_raj",
+    full_name: "Shivani Singh",
+    profile_picture: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop",
+}
 
 export const dummyStoriesData = [
     {
@@ -72,8 +95,8 @@ export const dummyStoriesData = [
         "_id": "688340046e4b42b685068a73",
         "user": dummyUserData,
         "content": "sahil singh",
-        "media_url": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
-        "media_type": "image",
+        "media_url": "https://videos.pexels.com/video-files/5469583/5469583-uhd_1440_2560_30fps.mp4",
+        "media_type": "video",
         "background_color": "#4f46e5",
         "createdAt": "2025-07-25T08:27:48.134Z",
         "updatedAt": "2025-07-25T08:27:48.134Z",
@@ -82,7 +105,7 @@ export const dummyStoriesData = [
         "_id": "68833fe96e4b42b685068a5e",
         "user": dummyUserData,
         "content": "sahil singh",
-        "media_url": "https://videos.pexels.com/video-files/14447442/14447442-hd_1080_1920_30fps.mp4",
+        "media_url": "https://videos.pexels.com/video-files/6616833/6616833-hd_1080_1920_25fps.mp4",
         "media_type": "video",
         "background_color": "#4f46e5",
         "createdAt": "2025-08-12T08:27:21.289Z",
@@ -125,7 +148,7 @@ export const dummyPostsData = [
     {
         "_id": "68773e977db16954a783839c",
         "user": dummyUserData,
-        "content": "We're a small #team with a big vision — working day and night to turn dreams into products, and #products into something people love.",
+        "content":  "We're a small #team with a big vision — working day and night to turn dreams into products, and #products into something people love. please like ,share ,follow and make a connection #lowdaykaball #viratkohli ",
         "image_urls": [
             "https://images.pexels.com/photos/1595385/pexels-photo-1595385.jpeg"
         ],
@@ -150,7 +173,7 @@ export const dummyPostsData = [
         "content": "This is a sample paragraph with some #hashtags like #socialmedia and #marketing. Let's find them!",
         "image_urls": [],
         "post_type": "text",
-        "likes_count": [],
+        "likes_count": ["user_2zdFoZib5lNr614LgkONdD8WG32"],
         "createdAt": "2025-07-09T13:14:09.144Z",
         "updatedAt": "2025-07-09T13:14:09.144Z",
     },
@@ -193,6 +216,28 @@ export const dummyPostsData = [
 ]
 
 export const dummyRecentMessagesData = [
+     {
+        "_id": "686fb66c7f0dcbff63b239e7",
+        "from_user_id": dummyUser3Data,
+        "to_user_id": dummyUserData,
+        "text": "babe, i'm pregnant!",
+        "message_type": "text",
+        "media_url": "",
+        "createdAt": "2025-07-10T12:47:40.510Z",
+        "updatedAt": "2025-07-10T12:47:40.510Z",
+        "seen": false
+    },
+    {
+        "_id": "68833af618623d2de81b5381",
+        "from_user_id": dummyUser2Data,
+        "to_user_id": dummyUserData,
+        "text": "I love you babe 🩷 ",
+        "message_type": "text",
+        "media_url": "",
+        "seen": true,
+        "createdAt": "2025-07-25T08:06:14.436Z",
+        "updatedAt": "2025-07-25T08:47:47.768Z",
+    },
     {
         "_id": "68833af618623d2de81b5381",
         "from_user_id": dummyUser2Data,
@@ -213,7 +258,29 @@ export const dummyRecentMessagesData = [
         "media_url": "",
         "createdAt": "2025-07-17T10:11:08.437Z",
         "updatedAt": "2025-07-25T08:07:11.893Z",
-        "seen": true
+        "seen": false,
+    },
+    {
+        "_id": "68833af618623d2de81b5381",
+        "from_user_id": dummyUser2Data,
+        "to_user_id": dummyUserData,
+        "text": "You are  so hot, Can i fuck you?",
+        "message_type": "text",
+        "media_url": "",
+        "seen": false,
+        "createdAt": "2025-07-25T08:06:14.436Z",
+        "updatedAt": "2025-07-25T08:47:47.768Z",
+    },
+       {
+        "_id": "6878cc3c17a54e4d3748012f",
+        "from_user_id": dummyUserData,
+        "to_user_id": dummyUserData,
+        "text": "This is a Samsung Tablet",
+        "message_type": "text",
+        "media_url": "",
+        "createdAt": "2025-07-17T10:11:08.437Z",
+        "updatedAt": "2025-07-25T08:07:11.893Z",
+        "seen": false,
     },
     {
         "_id": "686fb66c7f0dcbff63b239e7",
@@ -278,7 +345,10 @@ export const dummyMessagesData = [
 export const dummyConnectionsData = [
     dummyUserData,
     dummyUser2Data,
-    dummyUser3Data
+    dummyUser3Data,
+     dummyUser4Data,
+      dummyUser5Data,
+       dummyUser6Data
 ]
 
 export const dummyFollowersData = [

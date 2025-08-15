@@ -10,7 +10,7 @@ const Layout = () => {
 const user= dummyUserData
 
   return user ? (
-    <div className='w-full h-screen flex'>
+    <div  className=' w-full h-screen flex'>
       <Sidebar sidebaropen={sidebaropen} setsidebaropen={setsidebaropen} />
   <div className="flex-1 bg-slate-50">
     <Outlet/>

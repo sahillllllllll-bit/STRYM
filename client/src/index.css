@@ -5,3 +5,49 @@
 *{
   font-family: "Roboto", sans-serif;
 }
+
+.no-scrollbar::-webkit-scrollbar{
+  display:none;
+}
+
+/* In index.css or App.css */
+/* index.css or App.css */
+
+:root {
+  --primary-color: #3b82f6; /* default blue */
+  --text-color: #1e3a8a;     /* default dark blue text */
+}
+
+[data-theme='red'] {
+  --primary-color: #ef4444;
+  --text-color: #7f1d1d;
+}
+
+[data-theme='green'] {
+  --primary-color: #10b981;
+  --text-color: #064e3b;
+}
+
+[data-theme='purple'] {
+  --primary-color: #8b5cf6;
+  --text-color: #4c1d95;
+}
+
+[data-theme='orange'] {
+  --primary-color: #f97316;
+  --text-color: #78350f;
+}
+
+
+[data-theme='gray'] {
+  --primary-color: gray;
+    --text-color: black;
+}
+[data-theme='black'] {
+  --primary-color: rgb(24, 23, 23);
+    --text-color: rgb(62, 48, 48);
+}
+[data-theme='white'] {
+  --primary-color: white;
+    --text-color: black;
+}
