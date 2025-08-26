@@ -3,7 +3,7 @@ import sample_cover from './sample_cover.jpg'
 import sample_profile from './sample_profile.jpg'
 import bgImage from './bgImage.png'
 import group_users from './group_users.png'
-import { Home, MessageCircle, Search, UserIcon, Users,Projector, SunMoon } from 'lucide-react'
+import { Home, MessageCircle, Search, UserIcon, Users,Projector, SunMoon, Bot } from 'lucide-react'
 import sponsored_img from './sponsored_img.png'
 
 export const assets = {
@@ -17,8 +17,10 @@ export const assets = {
 
 export const menuItemsData = [
     { to: '/', label: 'Feed', Icon: Home },
-    { to: '/discover', label: 'Discover', Icon: Search },
+    { to: '/discover', label: 'Search', Icon: Search },
     { to: '/minto', label: 'Minto - Short Videos', Icon: Projector },
+    { to: '/strym-ai', label: 'STRYM-AI', Icon: Bot },
+
     { to: '/connections', label: 'Followers/Followings', Icon: Users },
     { to: '/messages', label: 'Messages', Icon: MessageCircle },
     { to: '/profile', label: 'Profile', Icon: UserIcon },
@@ -33,7 +35,7 @@ export const dummyUserData = {
     "bio": "🌍 Dreamer | 📚 Learner | 🚀 Doer\r\nExploring life one step at a time.\r\n✨ Staying curious. Creating with purpose.",
     "profile_picture": sample_profile,
     "cover_photo": sample_cover,
-    "location": "New York, NY",
+    "location": "Deoria,India",
     "followers": ["user_2", "user_3"],
     "following": ["user_2", "user_3"],
     "connections": ["user_2", "user_3"],
@@ -95,7 +97,7 @@ export const dummyStoriesData = [
         "_id": "688340046e4b42b685068a73",
         "user": dummyUserData,
         "content": "sahil singh",
-        "media_url": "https://videos.pexels.com/video-files/5469583/5469583-uhd_1440_2560_30fps.mp4",
+        "media_url": "https://videos.pexel.com/video-files/5469583/5469583-uhd_1440_2560_30fps.mp4",
         "media_type": "video",
         "background_color": "#4f46e5",
         "createdAt": "2025-07-25T08:27:48.134Z",
@@ -105,7 +107,7 @@ export const dummyStoriesData = [
         "_id": "68833fe96e4b42b685068a5e",
         "user": dummyUserData,
         "content": "sahil singh",
-        "media_url": "https://videos.pexels.com/video-files/6616833/6616833-hd_1080_1920_25fps.mp4",
+        "media_url": "https://videos.pexel.com/video-files/6616833/6616833-hd_1080_1920_25fps.mp4",
         "media_type": "video",
         "background_color": "#4f46e5",
         "createdAt": "2025-08-12T08:27:21.289Z",
@@ -220,7 +222,7 @@ export const dummyRecentMessagesData = [
         "_id": "686fb66c7f0dcbff63b239e7",
         "from_user_id": dummyUser3Data,
         "to_user_id": dummyUserData,
-        "text": "babe, i'm pregnant!",
+        "text": "babe, i'm suffosicated!",
         "message_type": "text",
         "media_url": "",
         "createdAt": "2025-07-10T12:47:40.510Z",
@@ -264,7 +266,7 @@ export const dummyRecentMessagesData = [
         "_id": "68833af618623d2de81b5381",
         "from_user_id": dummyUser2Data,
         "to_user_id": dummyUserData,
-        "text": "You are  so hot, Can i fuck you?",
+        "text": "You are  so ggod do you?",
         "message_type": "text",
         "media_url": "",
         "seen": false,
@@ -353,14 +355,20 @@ export const dummyConnectionsData = [
 
 export const dummyFollowersData = [
     dummyUser2Data,
-    dummyUser3Data
+    dummyUser3Data,
+     dummyUser4Data,
+      dummyUser5Data,
+       dummyUser6Data
 ]
 
 export const dummyFollowingData = [
     dummyUser2Data,
-    dummyUser3Data
+    dummyUser3Data,
+      dummyUser4Data,
+      dummyUser5Data,
 ]
 
 export const dummyPendingConnectionsData = [
-    dummyUserData
+    dummyUserData,
+      dummyUser5Data,
 ]
