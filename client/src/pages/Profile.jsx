@@ -5,6 +5,7 @@ import Loading from '../components/Loading';
 import UserProfileInfo from '../components/UserProfileInfo';
 import Postcard from '../components/Postcard';
 import moment from 'moment';
+import ProfileEditModal from '../components/ProfileEditModal';
 
 
 const Profile = () => {
@@ -89,7 +90,7 @@ user.cover_photo && <img src={user.cover_photo} alt='' className='w-full h-full 
 
    </div>
     {/* edit profile modal  */}
-   {showEdits && <p> Show Profile Edit </p>}
+   {showEdits && <ProfileEditModal setShowEdits={setShowEdits}/>}
     </div>
   ): (<Loading/>)
 }

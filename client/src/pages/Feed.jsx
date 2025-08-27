@@ -22,7 +22,7 @@ useEffect(()=>{
 
 
   return ! loading ? (
-    <div style={{ backgroundColor: 'var(--primary-color)', color: 'var(--text-color)' }} className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8 '>
+    <div  className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8 '>
        {/* posts and stories */}
        <div>
        <Storiesbar />

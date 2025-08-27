@@ -15,6 +15,7 @@ import Minto from "./pages/Minto";
 import { ThemeProvider } from './context/ThemeContext';
 import Theme from "./pages/Theme";
 import Strtym_ai from "./pages/Strtym_ai";
+import Chatbox from "./pages/Chatbox";
 
 
 function App() {
@@ -29,7 +30,7 @@ const {user}= useUser()
 
            <Route index element={<Feed />} />
           <Route path='messages' element={<Message />} />
-          <Route path='messages/:userid' element={<Message />} />
+          <Route path='messages/:userid' element={<Chatbox />} />
           <Route path='connections' element={<Connections />} />
           <Route path='profile' element={<Profile />} />
           <Route path='profile/:profileId' element={<Profile />} />

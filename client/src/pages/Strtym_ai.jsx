@@ -23,9 +23,10 @@ const Strtym_ai = () => {
         </div>
 
         {/* Right 20% */}
-        <div className="col-span-1 h-162 overflow-y-scroll no-scrollbar  border border-white bg-[#181717] p-4">
-          history
+        <div className="col-span-1 h-162 overflow-y-scroll no-scrollbar text-white  border border-white bg-[#181717] p-4">
+           History
         </div>
+        
       </div>
     </div>
   )
