@@ -16,9 +16,9 @@ const Strtym_ai = () => {
         {/* Left 80% */}
         <div className="col-span-4 h-162 overflow-y-scroll no-scrollbar border border-white bg-[#181717] p-4">
           <div className='absolute border rounded-4xl bottom-18 text-white left-105'>
-            <button className=' p-5 rounded ' ><Plus/></button>
+            <button className=' p-2 rounded-full hover:bg-indigo-900 active:scale-95   ' ><Plus/></button>
             <textarea className='w-180 resize-none    p-2   mt-4 text-sm outline-none placeholder-gray-400' placeholder="Ask Anything -strym"  />
-            <button className=' p-2 rounded '><Upload/> </button>
+            <button className=' p-2 rounded-full hover:bg-indigo-900 active:scale-95  '><Upload/> </button>
           </div>
         </div>
 
