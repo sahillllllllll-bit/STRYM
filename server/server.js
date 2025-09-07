@@ -23,7 +23,7 @@ app.use("/api/chat",chatRoutes );
 
 // Global error handling (inline)
 app.use((err, req, res, next) => {
-  console.error("❌ Backend error:", err);
+  console.error("❌ Backend errors:", err);
   res.status(500).json({ error: err.message || "Server Error" });
 });
 
