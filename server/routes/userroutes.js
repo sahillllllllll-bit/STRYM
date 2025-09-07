@@ -1,6 +1,6 @@
 import express from "express";
 import { protect } from "../middlewares/auth.js";
-import { discoverUser, followUser, getUserData, unfollowUser, updateUserData } from "../controllers/userController.js";
+import { acceptconnectionrequest, discoverUser, followUser, getuserconnections, getUserData, sendconnectionrequest, unfollowUser, updateUserData } from "../controllers/userController.js";
 import { upload } from "../configs/multer.js";
 
 const userRouter =express.Router();
@@ -10,5 +10,9 @@ userRouter.post('/update',upload.fields([{name:'profile',maxCount:1},{name:'cove
 userRouter.post('/discover',protect,discoverUser);
 userRouter.post('/follow',protect,followUser)
 userRouter.post('/unfollow',protect,unfollowUser)
+userRouter.post('/connect',protect,sendconnectionrequest)
+userRouter.post('/accept',protect,acceptconnectionrequest)
+userRouter.get('/connections',protect,getuserconnections)
+
 
 export default userRouter;
