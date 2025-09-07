@@ -14,8 +14,8 @@
 /* index.css or App.css */
 
 :root {
-  --primary-color: #3b82f6; /* default blue */
-  --text-color: #1e3a8a;     /* default dark blue text */
+  --primary-color: #041f4a; /* default blue */
+  --text-color: #8ba6f0;     /* default dark blue text */
 }
 
 [data-theme='red'] {

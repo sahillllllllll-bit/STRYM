@@ -1,35 +1,81 @@
-import { Plus, Upload } from 'lucide-react'
-import React from 'react'
+import React, { useState } from "react";
+import { formatGeminiAnswer } from "../utils/formatGeminiAnswer";
 
-const Strtym_ai = () => {
+
+function GeminiChat() {
+  const [message, setMessage] = useState("");
+  const [image, setImage] = useState(null);
+  const [reply, setReply] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setImage(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSend = async () => {
+    if (!message && !image) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:8080/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, image }),
+      });
+      const data = await res.json();
+      setReply(data.reply || "No reply received.");
+    } catch (err) {
+      setReply("❌ Error: " + err.message);
+      console.error(err);
+    }
+
+    setLoading(false);
+    setMessage("");
+    setImage(null);
+  };
+
   return (
-    <div className=" bg-[#181717]">
-      <div className=' border-b border-white'>
-        <h1 className="text-gray-500 text-4xl px-2 pt-4">STRYM-AI</h1>
-        <p className="text-indigo-500 px-3">
-          Your Partner in innovation, efficiency, and growth.
-        </p>
-      </div>
+    <div  className="max-w-500 p-2">
+      <h1>Ask Gemini</h1>
 
-      {/* Parent grid */}
-      <div className="grid grid-cols-5 w-full ">
-        {/* Left 80% */}
-        <div className="col-span-4 h-162 overflow-y-scroll no-scrollbar border border-white bg-[#181717] p-4">
-          <div className='absolute border rounded-4xl bottom-18 text-white left-105'>
-            <button className=' p-2 rounded-full hover:bg-indigo-900 active:scale-95   ' ><Plus/></button>
-            <textarea className='w-180 resize-none    p-2   mt-4 text-sm outline-none placeholder-gray-400' placeholder="Ask Anything -strym"  />
-            <button className=' p-2 rounded-full hover:bg-indigo-900 active:scale-95  '><Upload/> </button>
-          </div>
-        </div>
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        placeholder="Type your question..."
+        style={{ width: "100%", padding: 8, marginBottom: 10 }}
+      />
 
-        {/* Right 20% */}
-        <div className="col-span-1 h-162 overflow-y-scroll no-scrollbar text-white  border border-white bg-[#181717] p-4">
-           History
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+
+      {image && (
+        <div style={{ marginTop: 10 }}>
+          <img src={image} alt="preview" style={{ maxWidth: "100%", borderRadius: 8 }} />
         </div>
-        
-      </div>
+      )}
+
+      <button
+        onClick={handleSend}
+        disabled={loading}
+        style={{ marginTop: 10, padding: "8px 16px" }}
+      >
+        {loading ? "Sending..." : "Send"}
+      </button>
+
+      {/* Render formatted reply */}
+      {reply && (
+        <div style={{ marginTop: 20, background: "#f4f4f4", padding: 10, borderRadius: 6 }}>
+          <strong>Gemini:</strong>
+          {formatGeminiAnswer(reply)}
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-export default Strtym_ai
+export default GeminiChat;

@@ -8,7 +8,7 @@ import Discover from './pages/Discover'
 import Createpost from './pages/Createpost'
 import Createminto from './pages/Createminto'
 import Login from "./pages/Login"
-import { useUser } from "@clerk/clerk-react";
+import { useUser,useAuth } from "@clerk/clerk-react";
 import  Layout  from "./pages/Layout";
 import {Toaster} from "react-hot-toast";  // it is used to sedn notification
 import Minto from "./pages/Minto";
@@ -16,10 +16,18 @@ import { ThemeProvider } from './context/ThemeContext';
 import Theme from "./pages/Theme";
 import Strtym_ai from "./pages/Strtym_ai";
 import Chatbox from "./pages/Chatbox";
+import { useEffect } from "react";
 
 
 function App() {
 const {user}= useUser()
+const {getToken}= useAuth();
+ 
+useEffect(()=>{
+  if(user){
+    getToken().then((token)=>console.log(token))
+  }
+},[user])
 
   return (
     <>
