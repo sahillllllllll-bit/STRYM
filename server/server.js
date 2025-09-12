@@ -7,6 +7,9 @@ import { serve } from "inngest/express";
 import { clerkMiddleware } from '@clerk/express'
 import userRouter from "./routes/userroutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import postRouter from "./routes/postRoutes.js";
+import storyRouter from "./routes/storyRoutes.js";
+import messageRouter from "./routes/messageRoute.js";
 
 const app= express();
 app.use(express.json());
@@ -20,6 +23,11 @@ res.send("Hello , Welcome to the strym backend")
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use('/api/user',userRouter);
 app.use("/api/chat",chatRoutes );
+app.use("/api/post",postRouter );
+app.use("/api/story",storyRouter );
+app.use("/api/message", messageRouter);
+
+
 
 // Global error handling (inline)
 app.use((err, req, res, next) => {

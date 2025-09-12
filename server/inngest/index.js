@@ -1,8 +1,11 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
 
+
 import sendMail from "../configs/nodemailer.js";
 import Connection from "../models/Connection.js";
+import Story from "../models/Story.js";
+import Message from "../models/Message.js";
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "strym" });
 
@@ -118,7 +121,64 @@ const sendnewconnectionreminder = inngest.createFunction(
     }
 )
 
+// inngest Function to delete story after 20 hours
+const deleteStory = inngest.createFunction(
+    {id:"story-delete"},
+    {event:"app/story.delete"},
+    async ({event,step}) => {
+        const {storyId} = event.data;
+        const in24hrs = new Date(Date.now()+20*60*60*1000)
+        await step.sleepUntil('wait-for-24-hours',in24hrs)
+        await step.run("delete-story", async () => {
+            await Story.findByIdAndDelete(storyId)
+            return {message:"story-deleted"}
+        })
+    }
+)
+
+// inngest function to send notification of unseen message at 9 am
+
+const sendNotificationOfUnseenMessages =inngest.createFunction(
+    {id:"send-unseen-messages-notifiction"},
+    {cron:"TZ=America/New_York 0 9 * * *"},  // everyday at 9 am;
+    async ({step})=>{
+
+        const messages =await Message.find({seen:false}).populate('to_user_id');
+        const unseencount ={}
+         
+        messages.map(message=>{
+            unseencount[message.to_user_id._id]=(unseencount[message.to_user_id._id] || 0)+1;
+        })
+
+  for (const userId in unseencount) {
+    const user =await User.findById(userId);
+  
+const subject =`🩷 You have ${unseencount[userId]} unseen messages`;
+const body = `
+<div style="font-family: Arial, sans-serif; padding: 20px;">
+  <h2>Hi ${user.full_name},</h2>
+  <p>You have ${unseenCount[userId]} unseen messages</p>
+  <p>
+    Click <a href="${process.env.FRONTEND_URL}/messages" style="color: #10b981;">here</a> to view them
+  </p>
+  <br/>
+  <p>Thanks,<br/>PingUp - Stay Connected</p>
+</div>
+
+
+`;
+await sendMail({
+    to: user.email,
+    subject,
+    body
+})
+  }
+  return {message:"Notification Sent."}
+
+    }
+)
+
 
 
 // Create an empty array where we'll export future Inngest functions
-export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation,sendnewconnectionreminder];
+export const functions = [syncUserCreation, syncUserDeletion, syncUserUpdation,sendnewconnectionreminder,deleteStory,sendNotificationOfUnseenMessages];
