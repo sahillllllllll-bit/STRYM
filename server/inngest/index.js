@@ -13,11 +13,11 @@ let isConnected = false;
 
 async function connectDB() {
   if (isConnected) return;
-  if (!process.env.MONGODB_URI) {
+  if (!process.env.MONGODB_URL) {
     throw new Error("❌ MONGODB_URI not set in environment variables");
   }
 
-  await mongoose.connect(process.env.MONGODB_URI, {
+  await mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
