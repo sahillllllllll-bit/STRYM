@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react'
-import Sidebar from '../components/sidebar'
+import Sidebar from '../components/sidebar.jsx'
 import { Outlet } from 'react-router-dom'
 import { Menu, X } from 'lucide-react';
 import { dummyUserData } from '../assets/assets';
-import Loading from '../components/Loading';
+import Loading from '../components/Loading.jsx';
 import { useSelector } from 'react-redux';
 const Layout = () => {
  const [sidebaropen, setsidebaropen]= useState(false);
