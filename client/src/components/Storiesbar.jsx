@@ -4,15 +4,32 @@ import { Plus } from 'lucide-react';
 import moment from 'moment';   // this helps to convert the date and time into a day ago, two days ago like
 import Storiesmodal from './Storiesmodal';
 import Storyviewer from './Storyviewer';
+import { useAuth } from '@clerk/clerk-react';
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 const Storiesbar = () => {
 
+    const {getToken} = useAuth();
     const [stories, setStories] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [viewStory, setViewStory] = useState(null);
 
     const fetchstories = async () => {
-        setStories(dummyStoriesData);
+       try {
+        const token = await getToken();
+        const {data} = await api.get(`/api/story/get`,
+            {headers:{Authorization:`Bearer ${token}`}}
+        )
+        if(data.success){
+         setStories(data.stories)
+        }else{
+            toast(data.message)
+        }
+       } catch (error) {
+            toast.error(error.message)
+        
+       }
     }
 
     useEffect(() => {

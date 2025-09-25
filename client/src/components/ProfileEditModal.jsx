@@ -1,9 +1,17 @@
 import React, { useState } from 'react'
 import { dummyUserData } from '../assets/assets'
 import { Pencil } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUser } from '../../features/user/userSlice.js';
+import toast from 'react-hot-toast';
+import { useAuth } from '@clerk/clerk-react';
+
 
 const ProfileEditModal = ({setShowEdits}) => {
-    const user =dummyUserData;
+
+  const dispatch = useDispatch();
+  const {getToken} = useAuth();
+    const user =useSelector((state)=>state.user.value);
     const [editForm, setEditForm] =useState({
         username:user.username,
         bio :user.bio,
@@ -13,9 +21,32 @@ const ProfileEditModal = ({setShowEdits}) => {
         full_name :user.full_name,
     })
 
-    const handleSaveProfile = async (e) => {
-        e.preventDefault();
+   const handleSaveProfile = async (e) => {
+  e.preventDefault();
+  try {
+    const userData = new FormData();
+    const { full_name, username, bio, location, profile_picture, cover_photo } = editForm;
+
+    userData.append('username', username);
+    userData.append('bio', bio);
+    userData.append('location', location);
+    userData.append('full_name', full_name);
+
+    if (profile_picture instanceof File) {
+      userData.append('profile', profile_picture);
     }
+    if (cover_photo instanceof File) {
+      userData.append('cover', cover_photo);
+    }
+
+    const token = await getToken();
+    dispatch(updateUser({ userData, token }));
+    setShowEdits(false);
+  } catch (error) {
+    toast.error("Error saving profile");
+  }
+};
+
 
   return (
     <div className='fixed  top-0 bottom-0 left-0 right-0  z-110 h-screen bg-black/50 overflow-y-scroll'>
@@ -24,7 +55,7 @@ const ProfileEditModal = ({setShowEdits}) => {
    <h1 className='text-2xl font-bold text-gray-900 mb-6'>
  Edit Profile
    </h1>
-   <form  className='space-y-4' onSubmit={handleSaveProfile}>
+   <form  className='space-y-4' onSubmit={e=> toast.promise(handleSaveProfile(e),{loading:'Saving...'})}>
 
    <div className='flex flex-col items-start gap-3'>
     <label htmlFor="profile_picture" className='block text-sm font-medium text-gray-700 mb-1'>

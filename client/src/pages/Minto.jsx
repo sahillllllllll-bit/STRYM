@@ -1,77 +1,9 @@
-// Minto.jsx
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Heart,
-  MessageCircle,
-  Share2,
-  MoreVertical,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  X,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom"; // ✅ if using routing
-
-const reelsData = [
-  {
-    id: 1,
-    username: "traveler_01",
-    caption: "Exploring the mountains 🌄",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 1234567383,
-  },
-  {
-    id: 2,
-    username: "chef_life",
-    caption: "Quick pasta recipe 🍝🔥",
-    src: "https://www.w3schools.com/html/movie.mp4",
-    likes: 987,
-  },
-  {
-    id: 3,
-    username: "tech_guru",
-    caption: "5 coding tips to speed up ⌨️⚡",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 432,
-  },
-   {
-    id: 4,
-    username: "tech_guru",
-    caption: "5 coding tips to speed up ⌨️⚡",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 432,
-  },
-
-   {
-    id: 5,
-    username: "tech_guru",
-    caption: "5 coding tips to speed up ⌨️⚡",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 432,
-  },
-   {
-    id: 6,
-    username: "tech_guru",
-    caption: "5 coding tips to speed up ⌨️⚡",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 432,
-  },
-   {
-    id: 7,
-    username: "tech_guru",
-    caption: "5 coding tips to speed up ⌨️⚡",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 432,
-  },
-   {
-    id: 8,
-    username: "tech_guru",
-    caption: "5 coding tips to speed up ⌨️⚡",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-    likes: 432,
-  },
-];
+import { Heart, MessageCircle, Share2, MoreVertical, Play, Pause, Volume2, VolumeX, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
 
 export default function Minto({ onClose }) {
   const containerRef = useRef(null);
@@ -81,18 +13,41 @@ export default function Minto({ onClose }) {
   const [following, setFollowing] = useState({});
   const [muted, setMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [reelsData, setReelsData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const isTransitioningRef = useRef(false);
   const touchStartYRef = useRef(0);
 
-  const navigate = useNavigate(); // ✅ if using router
+  const navigate = useNavigate();
+  const { getToken } = useAuth();
 
-  // Lock page scroll
+  // Lock scroll
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
+    return () => (document.body.style.overflow = prevOverflow);
+  }, []);
+
+  // Fetch reels
+  const fetchReels = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/api/minto/feed", {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      if (data.success) setReelsData(data.reels);
+      else toast.error(data.message);
+
+      console.log("Fetched reels:", data.reels); // 🔽 Added: Debug log
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReels();
   }, []);
 
   // Play only current reel
@@ -109,20 +64,18 @@ export default function Minto({ onClose }) {
     });
   }, [current, muted, isPlaying]);
 
+  // Navigation functions
   const goTo = (nextIndex) => {
     if (nextIndex < 0 || nextIndex >= reelsData.length) return;
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
     setCurrent(nextIndex);
-    setTimeout(() => {
-      isTransitioningRef.current = false;
-    }, 450);
+    setTimeout(() => (isTransitioningRef.current = false), 450);
   };
-
   const next = () => goTo(current + 1);
   const prev = () => goTo(current - 1);
 
-  // Mouse wheel nav
+  // Mouse wheel navigation
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -133,32 +86,27 @@ export default function Minto({ onClose }) {
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [current]);
+  }, [current, reelsData]);
 
-  // Touch swipe nav
+  // Touch navigation
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const onTouchStart = (e) => {
-      touchStartYRef.current = e.touches[0].clientY;
-    };
-    const onTouchMove = (e) => e.preventDefault();
+    const onTouchStart = (e) => (touchStartYRef.current = e.touches[0].clientY);
     const onTouchEnd = (e) => {
       const delta = touchStartYRef.current - e.changedTouches[0].clientY;
       if (delta > 50) next();
       else if (delta < -50) prev();
     };
     el.addEventListener("touchstart", onTouchStart, { passive: false });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd, { passive: false });
     return () => {
       el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
     };
-  }, [current]);
+  }, [current, reelsData]);
 
-  // Keyboard
+  // Keyboard controls
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "ArrowUp") prev();
@@ -172,11 +120,8 @@ export default function Minto({ onClose }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [current, isPlaying, muted]);
+  }, [current, isPlaying, muted, reelsData]);
 
-  const toggleLike = (id) => setLikes((p) => ({ ...p, [id]: !p[id] }));
-  const toggleFollow = (username) =>
-    setFollowing((p) => ({ ...p, [username]: !p[username] }));
   const togglePlay = () => {
     const v = videoRefs.current[current];
     if (!v) return;
@@ -188,6 +133,7 @@ export default function Minto({ onClose }) {
       setIsPlaying(false);
     }
   };
+
   const toggleMute = () => {
     const v = videoRefs.current[current];
     if (!v) return;
@@ -196,85 +142,111 @@ export default function Minto({ onClose }) {
   };
 
   const handleClose = () => {
-    if (onClose) onClose(); // close via parent state
-    else navigate("/"); // or navigate back to feed route
+    if (onClose) onClose();
+    else navigate("/");
   };
+
+  const toggleLike = (id) => setLikes((p) => ({ ...p, [id]: !p[id] }));
+  const toggleFollow = (username) =>
+    setFollowing((p) => ({ ...p, [username]: !p[username] }));
+
+  if (loading) return <div className="text-white">Loading reels...</div>;
 
   return (
     <div
       ref={containerRef}
       className="fixed inset-0 z-[1000] bg-black flex items-center justify-center overflow-hidden select-none"
     >
-      {/* Close Button */}
       <button
         onClick={handleClose}
         className="absolute top-5 left-5 z-[1100] p-2 bg-black/50 rounded-full text-white"
-        aria-label="Close"
       >
         <X size={24} />
       </button>
-
       <div className="relative w-[100vw] h-[100vh] md:max-w-[420px] md:max-h-[740px]">
         {reelsData.map((reel, i) => (
           <div
-            key={reel.id}
-            className={`absolute inset-0 transition-transform duration-500 ease-out
-              ${i === current ? "translate-y-0" : i < current ? "-translate-y-full" : "translate-y-full"}`}
+            key={reel._id}
+            className={`absolute inset-0 transition-transform duration-500 ease-out ${
+              i === current
+                ? "translate-y-0"
+                : i < current
+                ? "-translate-y-full"
+                : "translate-y-full"
+            }`}
           >
             <video
               ref={(el) => (videoRefs.current[i] = el)}
-              src={reel.src}
+              src={reel.video_url}
               className="w-full h-full object-cover"
               loop
               playsInline
               muted={muted}
               onClick={togglePlay}
             />
-            {/* username + follow + caption */}
             <div className="absolute bottom-20 left-4 right-24 text-white">
               <div className="flex items-center gap-3 mb-2">
-                <span className="font-semibold">@{reel.username}</span>
-                <button
-                  onClick={() => toggleFollow(reel.username)}
-                  className="text-xs bg-white text-black px-3 py-1 rounded-full"
-                >
-                  {following[reel.username] ? "Following" : "Follow"}
-                </button>
+                {/* 🔽 Changed: safe access + fallback */}
+                <span className="font-semibold">
+                  @{reel?.user?.username ?? "unknown"}
+                </span>
+
+                {/* 🔽 Changed: render follow button only if username exists */}
+                {reel?.user?.username && (
+                  <button
+                    onClick={() => toggleFollow(reel.user.username)}
+                    className="text-xs bg-white text-black px-3 py-1 rounded-full"
+                  >
+                    {following[reel.user.username]
+                      ? "Following"
+                      : "Follow"}
+                  </button>
+                )}
               </div>
-              <p className="text-sm opacity-95 leading-snug">{reel.caption}</p>
+              <p className="text-sm opacity-95 leading-snug">
+                {reel.content}
+              </p>
             </div>
-            {/* right rail */}
             <div className="absolute bottom-24 right-3 flex flex-col gap-5 items-center text-white">
-              <button onClick={() => toggleLike(reel.id)}>
+              <button onClick={() => toggleLike(reel._id)}>
                 <Heart
                   size={28}
-                  className={likes[reel.id] ? "text-red-500 fill-red-500" : ""}
+                  className={
+                    likes[reel._id] ? "text-red-500 fill-red-500" : ""
+                  }
                 />
                 <span className="text-[11px] mt-1">
-                  {(likes[reel.id] ? reel.likes + 1 : reel.likes).toLocaleString()}
+                  {(
+                    likes[reel._id]
+                      ? reel.likes_count.length + 1
+                      : reel.likes_count.length
+                  ).toLocaleString()}
                 </span>
               </button>
-              <button><MessageCircle size={28} /></button>
-              <button><Share2 size={28} /></button>
-              <button><MoreVertical size={28} /></button>
+              <button>
+                <MessageCircle size={28} />
+              </button>
+              <button>
+                <Share2 size={28} />
+              </button>
+              <button>
+                <MoreVertical size={28} />
+              </button>
             </div>
-            {/* bottom-left controls */}
             <div className="absolute bottom-6 left-4 flex gap-3">
-              <button onClick={togglePlay} className="p-2 bg-black/50 rounded-full">
+              <button
+                onClick={togglePlay}
+                className="p-2 bg-black/50 rounded-full"
+              >
                 {isPlaying ? <Pause size={18} /> : <Play size={18} />}
               </button>
-              <button onClick={toggleMute} className="p-2 bg-black/50 rounded-full">
+              <button
+                onClick={toggleMute}
+                className="p-2 bg-black/50 rounded-full"
+              >
                 {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
               </button>
             </div>
-            {/* paused overlay */}
-            {!isPlaying && i === current && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="p-4 rounded-full bg-black/40">
-                  <Play size={36} className="text-white" />
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>

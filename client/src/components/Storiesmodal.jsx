@@ -1,6 +1,8 @@
+import { useAuth } from '@clerk/clerk-react';
 import { ArrowLeft, Sparkle, TextIcon, Upload } from 'lucide-react';
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
+import api from '../../api/axios';
 
 const Storiesmodal = ({setShowModal, fetchStories}) => {
 
@@ -11,6 +13,7 @@ const Storiesmodal = ({setShowModal, fetchStories}) => {
    const [text, setText] =useState("");
    const [media, setMedia] =useState(null);
    const [previewUrl, setPreviewURl] =useState(null);
+   const {getToken}= useAuth();
 
    const handleMediaUpload =(e)=>{
     const file=e.target.files?.[0]
@@ -20,7 +23,37 @@ const Storiesmodal = ({setShowModal, fetchStories}) => {
     }
    }
 
+   const max_video_duration =60;
+   const max_video_size =50;
    const handleCreateStory =async ()=>{
+  const media_type =mode === 'media' ?media?.type.startsWith('image')?'image':'video':'text';
+  if(media_type==='text' &&!text){
+    throw new Error("Please Enter Some Text")
+  }
+
+  let formdata = new FormData();
+  formdata.append('content',text);
+  formdata.append('media_type',media_type);
+  formdata.append('media',media);
+  formdata.append('background_color',background);
+    const token = await getToken();
+    try {
+        const {data} = await api.post(`/api/story/create`,formdata,
+            {headers :{Authorization:`Bearer ${ token}`}}
+        )
+
+        if(data.success){
+            setShowModal(false)
+            toast.success("Story Created Successfully")
+            fetchStories();
+
+        }else{
+            toast.error(data.message)
+        }
+    } catch (error) {
+            toast.error(error.message)
+        
+    } 
 
    }
 

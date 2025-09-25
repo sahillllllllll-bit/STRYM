@@ -10,6 +10,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import postRouter from "./routes/postRoutes.js";
 import storyRouter from "./routes/storyRoutes.js";
 import messageRouter from "./routes/messageRoute.js";
+import reelRouter from "./routes/mintoRoutes.js";
 
 const app= express();
 app.use(express.json());
@@ -26,6 +27,8 @@ app.use("/api/chat",chatRoutes );
 app.use("/api/post",postRouter );
 app.use("/api/story",storyRouter );
 app.use("/api/message", messageRouter);
+app.use("/api/minto", reelRouter);
+
 
 
 
@@ -36,5 +39,5 @@ app.use((err, req, res, next) => {
 });
 
 
-const  Port =process.env.port ||8080;
+const  Port =process.env.port ||8000;
 app.listen(Port,()=> console.log(`App is listening on port ${Port} `))

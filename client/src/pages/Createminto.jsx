@@ -2,25 +2,53 @@ import React, { useState } from "react";
 import { dummyUserData } from "../assets/assets";
 import { X, Video, CirclePlus } from "lucide-react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import api from "../../api/axios.js";
+import { useAuth } from "@clerk/clerk-react";
+
 
 const Createpost = () => {
+
+  const {getToken} = useAuth();
   const [content, setContent] = useState("");
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const user = dummyUserData;
+  const user = useSelector((state) => state.user.value);
+  const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleReelSubmit = async () => {
+    if (videos.length === 0) return toast.error("Please upload a video");
+    setLoading(true);
+
     try {
-      setLoading(true);
-      // 🔹 Here you’d normally upload video + content to backend
-      await new Promise((res) => setTimeout(res, 2000)); // mock API delay
-      setContent("");
-      setVideos([]);
-      return true; // success
-    } catch (err) {
-      throw new Error("Upload failed");
+      const formData = new FormData();
+      formData.append("content", content);
+      videos.forEach((file) => formData.append("videos", file));
+      formData.append("post_types", "reel");
+
+      const { data } = await api.post("/api/minto/add", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+
+      if (data.success) {
+        toast.success("Reel uploaded successfully 🎥");
+        navigate("/");
+      } else {
+        throw new Error(data.message || "Something went wrong");
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error("Server Error:", error.response.data);
+        toast.error(error.response.data?.message || "Server error occurred");
+      } else {
+        console.error("Request Error:", error.message);
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -92,7 +120,6 @@ const Createpost = () => {
               <span>Select Video</span>
             </label>
 
-            {/* input for only videos */}
             <input
               type="file"
               id="video"
@@ -105,7 +132,7 @@ const Createpost = () => {
             <button
               disabled={loading}
               onClick={() =>
-                toast.promise(handleSubmit(), {
+                toast.promise(handleReelSubmit(), {
                   loading: "Uploading...",
                   success: <p>Video Uploaded 🎉</p>,
                   error: <p>Upload Failed ❌</p>,
@@ -118,10 +145,13 @@ const Createpost = () => {
           </div>
         </div>
       </div>
-       <Link to='/create-post' className='flex items-center justify-center gap-2 py-2.5 mt-6 mx-6 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600  hover:to-purple-800 active:scale-95  transition text-white cursor-pointer'>
-  <CirclePlus className='h-5 w-5'/>
-  Create Post 
- </Link>
+      <Link
+        to="/create-post"
+        className="flex items-center justify-center gap-2 py-2.5 mt-6 mx-6 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-800 active:scale-95 transition text-white cursor-pointer"
+      >
+        <CirclePlus className="h-5 w-5" />
+        Create Post
+      </Link>
     </div>
   );
 };

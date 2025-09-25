@@ -15,6 +15,7 @@ userRouter.post('/connect',protect,sendconnectionrequest)
 userRouter.post('/accept',protect,acceptconnectionrequest)
 userRouter.get('/connections',protect,getuserconnections)
 userRouter.get('/profiles',getUserProfiles);
+userRouter.post('/profiles', getUserProfiles);
 
 userRouter.get('/recent-messages',protect,getUserRecentMessages);
 

@@ -2,20 +2,21 @@ import React, { useState } from 'react'
 import { dummyUserData } from '../assets/assets';
 import { CirclePlus, Image, X } from 'lucide-react';
 import toast from 'react-hot-toast'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import {useAuth} from '@clerk/clerk-react';
+import api from '../../api/axios.js';
 
 const Createpost = () => {
-
+  const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
 
-  const user = dummyUserData;
-
-  const handleSubmit = async () => {
-
-  }
-
+  const user = useSelector((state)=>state.user.value);
+  const {getToken} = useAuth();
+  
+  3
 
 
   return (

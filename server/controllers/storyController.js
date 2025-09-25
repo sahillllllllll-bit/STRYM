@@ -57,21 +57,31 @@ export const addUserStory = async (req,res) => {
 
 // get user stories 
 
-export const getStories = async (req,res) => {
-    try {
-       const {userId} = req.auth();
-       const user = await User.findById(userId);
+export const getStories = async (req, res) => {
+  try {
+    const { userId } = req.auth(); // use function
 
-       // user connections and following 
-       const userIds = [userId,...user.connections,...user.following]
-       const stories= await Story.find({
-        user:{$in:userIds}
-    }).populate('user').sort({createdAt :-1});
-    res.json({success:true,stories})
-   
-
-    } catch (error) {
-        console.log(error)
-        res.json({success:true,message:error.message})
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
-}
+
+    const userIds = [
+      userId,
+      ...(user.connections || []),
+      ...(user.following || [])
+    ];
+
+    const stories = await Story.find({
+      user: { $in: userIds }
+    })
+      .populate("user")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, stories });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

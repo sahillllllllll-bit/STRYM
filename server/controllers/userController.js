@@ -1,6 +1,7 @@
 
 
 import imagekit from "../configs/imageKit.js";
+import { inngest } from "../inngest/index.js";
 import Connection from "../models/Connection.js";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
@@ -31,12 +32,17 @@ export const updateUserData = async (req, res) => {
     let { username, bio, location, full_name } = req.body;
 
     const tempUser = await User.findById(userId);
-    !username && (username = tempUser.username);
+    if (!tempUser) {
+      return res.json({ success: false, message: "User not found" });
+    }
 
+    if (!username) username = tempUser.username;
+
+    // ✅ check unique username
     if (tempUser.username !== username) {
-      const user = await User.findOne({ username })
-      if (user) {
-        username = tempUser;  // not change the username 
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        username = tempUser.username; // keep old username
       }
     }
 
@@ -45,58 +51,55 @@ export const updateUserData = async (req, res) => {
       bio,
       location,
       full_name,
-    }
+    };
 
-    const profile = req.files.profile && req.files.profile[0];
-    const cover = req.files.cover && req.files.cover[0];
+    // ✅ multer should be setup with: upload.fields([{ name: "profile" }, { name: "cover" }])
+    const profile = req.files?.profile?.[0];
+    const cover = req.files?.cover?.[0];
 
     if (profile) {
-      const buffer = fs.readFileSync(profile.path)
+      const buffer = fs.readFileSync(profile.path);
       const response = await imagekit.upload({
         file: buffer,
-        filename: profile.originalname,
-      })
+        fileName: profile.originalname,
+      });
 
-      const url = imagekit.url({
-        path: response.filePath,
-        transformation: [
-          { quality: 'auto' },
-          { format: 'webp' },
-          { width: '512' }
-        ]
-      })
-
-      updatedData.profile_picture = url;
+      updatedData.profile_picture = response.url; // ✅ schema uses profile_picture
+      console.log("Uploaded profile:", response.url);
     }
 
     if (cover) {
-      const buffer = fs.readFileSync(cover.path)
+      const buffer = fs.readFileSync(cover.path);
       const response = await imagekit.upload({
         file: buffer,
-        filename: profile.originalname,
-      })
+        fileName: cover.originalname,
+      });
 
-      const url = imagekit.url({
-        path: response.filePath,
-        transformation: [
-          { quality: 'auto' },
-          { format: 'webp' },
-          { width: '1280' }
-        ]
-      })
-
-      updatedData.cover_photo = url;
+      updatedData.cover_photo = response.url; // ✅ schema uses cover_photo
+      console.log("Uploaded cover:", response.url);
     }
 
+    console.log("Final updatedData:", updatedData);
 
-    const user = await User.findByIdAndUpdate(userId, updatedData, { new: true })
-    res.json({ success: true, message: "Profile Updated successfully" })
+    // ✅ update MongoDB
+    const user = await User.findByIdAndUpdate(userId, updatedData, { new: true });
 
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    console.log("Updated user in DB:", user);
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message })
+    console.error("Error updating profile:", error);
+    res.json({ success: false, message: error.message });
   }
-}
+};
 
 
 //  ddiscover user data using email , id, location , bio
@@ -193,14 +196,14 @@ export const sendconnectionrequest = async (req, res) => {
     }
 
     // check if the users are already connected
-    const connection = await connection.findOne({
+    const connection = await Connection.findOne({
       $or: [
         { from_user_id: userId, to_user_id: id },
         { from_user_id: id, to_user_id: userId }
       ]
     })
     if (!connection) {
-       const newconnection=  await connection.create({
+       const newconnection=  await Connection.create({
         from_user_id: userId,
         to_user_id: id,
       })
@@ -226,26 +229,41 @@ export const sendconnectionrequest = async (req, res) => {
 
 
 // get user data
- export const getuserconnections =async (req,res) => {
+ // get user connections
+export const getuserconnections = async (req, res) => {
   try {
-    const {userId} = reqauth();
-    const user = await User.findById(userId).populate('connections followers following')
-    const connections= user.connections
-    const followers= user.followers
-    const following =user.following
+    const { userId } = req.auth();
+    const user = await User.findById(userId).populate("connections followers following");
 
-    const pendingconnections =(await Connection.find({to_user_id:userId,status:'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    // get pending connections
+    const pendingConnections = (
+      await Connection.find({ to_user_id: userId, status: "pending" }).populate("from_user_id")
+    ).map(connection => connection.from_user_id);
+
+    // ✅ Send all data to frontend here
+    return res.json({
+      success: true,
+      connections: user.connections || [],
+      followers: user.followers || [],
+      following: user.following || [],
+      pendingConnections: pendingConnections || []
+    });
 
   } catch (error) {
-    console.log(error)
-    res.json({success:false,message:error.message})
+    console.log(error);
+    return res.json({ success: false, message: error.message });
   }
- }
+};
+
 
  // send connection request
  export const acceptconnectionrequest =async (req,res) => {
   try {
-    const {userId} = reqauth();
+    const {userId} = req.auth();
    const {id}= req.body;
 
    const connection = await Connection.findOne({from_user_id:id,to_user_id:userId})
@@ -274,18 +292,31 @@ export const sendconnectionrequest = async (req, res) => {
 
  //get user profiles
 
- export const getUserProfiles =async (req,res) => {
+export const getUserProfiles = async (req, res) => {
   try {
-     const {profileId} = req.body;
-     const profile = await User.findById(profileId)
-     if(!profile){
-       return res.json({success:false,message:"Profile Not Found"})
-     }
-const posts = await Post.find({user:profileId}).populate('user')
-  res.json({success:true,profile, posts})
+    const { profileId } = req.body; // from frontend POST request
 
+    if (!profileId) {
+      return res.json({ success: false, message: "ProfileId is required" });
+    }
+
+    const profile = await User.findById(profileId)
+      .populate("followers")
+      .populate("following");
+
+    if (!profile) {
+      return res.json({ success: false, message: "Profile Not Found" });
+    }
+
+    const posts = await Post.find({ user: profileId }).populate("user");
+
+    res.json({
+      success: true,
+      profile,
+      posts,
+    });
   } catch (error) {
-     console.log(error)
-    res.json({success:false,message:error.message})
+    console.error(error);
+    res.json({ success: false, message: error.message });
   }
- }
+};

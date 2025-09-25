@@ -6,9 +6,16 @@ import UserProfileInfo from '../components/UserProfileInfo';
 import Postcard from '../components/Postcard';
 import moment from 'moment';
 import ProfileEditModal from '../components/ProfileEditModal';
+import { useAuth } from '@clerk/clerk-react';
+import api from '../../api/axios.js';
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
 
 const Profile = () => {
+
+  const currentUser = useSelector((state)=> state.user.value)
+  const { getToken }= useAuth();
   const {profileId} = useParams();
   const [user, setUser] = useState(null)
   const [posts,setPosts]= useState([])
@@ -16,13 +23,46 @@ const Profile = () => {
   const [showEdits, setShowEdits]= useState(false)
   
   
-  const fetchUser = async () => {
-    setUser(dummyUserData)
-    setPosts(dummyPostsData)
+
+
+
+// make sure fetchUser accepts an argument
+const fetchUser = async (profileId) => {
+  const token = await getToken();
+  try {
+    const { data } = await api.post(
+      `/api/user/profiles`,
+      { profileId },  // <-- correctly passing profileId
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (data.success) {
+      setUser(data.profile);
+      setPosts(data.posts);
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+    console.log(error);
   }
-  useEffect(()=>{
-   fetchUser();
-  },[profileId])
+};
+
+useEffect(() => {
+  const loadUser = async () => {
+    if (profileId) {
+      // if visiting someone else's profile (via URL param)
+      await fetchUser(profileId);
+    } else if (currentUser?._id) {
+      // if visiting your own profile
+      await fetchUser(currentUser._id);
+    }
+  };
+
+  loadUser();
+}, [profileId, currentUser]);
+
+
   return user ? (
     <div className=' relative h-full overflow-y-scroll bg-gray-50 p-6'>
    <div className='max-w-3xl mx-auto'>
