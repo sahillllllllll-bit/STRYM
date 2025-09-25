@@ -29,7 +29,7 @@ function GeminiChat() {
         formData.append("image", blob, "image.png");
       }
 
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch("https://strym-three.vercel.app/api/chat", {
         method: "POST",
         body: formData,
       });
